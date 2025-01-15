@@ -22,7 +22,6 @@ async function generateEmbeddings(texts) {
                 input: text,
                 encoding_format: 'float',
             })
-            // console.log('Embeddings response:', response.data[0].embedding)
             embeddingsArray.push(response.data[0].embedding)
         }
     } catch (error) {
@@ -32,11 +31,8 @@ async function generateEmbeddings(texts) {
 }
 
 async function createAndStoreEmbeddings(embeddings) {
-    // console.log('embeddings:', embeddings)
     const indexName = 'embeddings-index'
     const indexes = await pinecone.listIndexes()
-    // console.log('-------------')
-    // console.log('Pinecone Indexes:', indexes.indexes)
 
     const doesIndexExist = (name) => {
         console.log('Checking existence of index..', indexes)
@@ -53,7 +49,6 @@ async function createAndStoreEmbeddings(embeddings) {
         console.log('Building new index...')
         await pinecone.createIndex({
             name: indexName,
-            // dimension: embeddings[0].length, -- OpenAI is returning "undefined", which is breaking it at the moment
             dimension: 3072,
             spec: { serverless: { cloud: 'aws', region: 'us-east-1' } },
         })
@@ -64,22 +59,18 @@ async function createAndStoreEmbeddings(embeddings) {
     const items = [
         { id: 'artichoke', values: embeddings[0] },
         { id: 'marmalade', values: embeddings[1] },
-        // { id: 'item_1', values: [0.2, 0.1, 0.3, 0.6, 0.3, 0.7, 0.3, 0.87] },
-        // { id: 'item_2', values: [0.01, 0.3, 0.77, 0.65, 0.3, 0.43, 0.2, 0.3] },
     ]
-    // console.log('Items from Pinecone function:', items)
     await index.upsert(items)
-
-    // console.log('Embeddings stored in Pinecone!')
 }
 
-async function queryPinecone(queryEmbedding) {
+async function queryPinecone(queryEmbeddings) {
     const index = pinecone.Index('embeddings-index')
+    console.log('Query Embeddings', queryEmbeddings)
 
     const queryResponse = await index.query({
         // queries: [{ values: queryEmbedding }],
         // topK: 2,
-        vector: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+        vector: queryEmbeddings[2],
         topK: 3,
         includeValues: true,
     })
@@ -87,11 +78,8 @@ async function queryPinecone(queryEmbedding) {
     console.log('Query Results:', queryResponse)
 }
 
-generateEmbeddings(texts)
-    .then((embeddings) => {
-        // console.log('Generated Embeddings From OpenAI:', embeddings)
-        createAndStoreEmbeddings(embeddings)
-    })
-    .then((embeddings) => {
-        queryPinecone(embeddings) // embedding values don't matter because everything is hardcoded right now.
-    })
+generateEmbeddings(texts).then((embeddings) => {
+    console.log('Generated Embeddings From OpenAI:', embeddings)
+    createAndStoreEmbeddings(embeddings)
+    queryPinecone(embeddings)
+})
