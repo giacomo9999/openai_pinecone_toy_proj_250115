@@ -65,8 +65,6 @@ async function createAndStoreEmbeddings(embeddings) {
 
 async function queryPinecone(queryEmbeddings) {
     const index = pinecone.Index('embeddings-index')
-    console.log('Query Embeddings', queryEmbeddings)
-
     const queryResponse = await index.query({
         // queries: [{ values: queryEmbedding }],
         // topK: 2,
@@ -79,7 +77,6 @@ async function queryPinecone(queryEmbeddings) {
 }
 
 generateEmbeddings(texts).then((embeddings) => {
-    console.log('Generated Embeddings From OpenAI:', embeddings)
     createAndStoreEmbeddings(embeddings)
     queryPinecone(embeddings)
 })
