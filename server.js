@@ -16,7 +16,7 @@ const texts = [
 async function generateEmbeddings(texts) {
     const embeddingsArray = []
     try {
-        for (const text of texts) {
+        for (let text of texts) {
             const response = await openai.embeddings.create({
                 model: 'text-embedding-3-large',
                 input: text,
