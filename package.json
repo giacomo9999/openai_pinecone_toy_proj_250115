@@ -1,0 +1,18 @@
+{
+    "name": "jim-rag-250115",
+    "version": "1.0.0",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@pinecone-database/pinecone": "^4.1.0",
+        "dotenv": "^16.4.7",
+        "openai": "^4.78.1"
+    },
+    "type": "module"
+}
